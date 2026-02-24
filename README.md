@@ -44,7 +44,7 @@ Solimesh is built strictly within free-tier limits to ensure the project remains
 
 ### 1. Clone the repository
 \`\`\`bash
-git clone https://github.com/YOUR_USERNAME/Solimesh.git
+git clone https://github.com/ShivamGawade-XS/Solimesh.git
 cd Solimesh
 \`\`\`
 

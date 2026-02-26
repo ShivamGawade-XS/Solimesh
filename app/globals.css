@@ -8,21 +8,207 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  color: #e0e0ff;
+  min-height: 100vh;
+}
+
+/* Cyberpunk base styles */
+@layer base {
+  h1 {
+    @apply text-4xl font-bold bg-gradient-to-r from-cyber-accent to-cyber-accent3 bg-clip-text text-transparent;
+  }
+
+  h2 {
+    @apply text-3xl font-bold text-cyber-text;
+  }
+
+  h3 {
+    @apply text-xl font-semibold text-cyber-text;
+  }
+
+  p {
+    @apply text-cyber-text2;
+  }
+
+  a {
+    @apply transition-all duration-300;
+  }
+
+  button {
+    @apply transition-all duration-300 ease-out;
+  }
+}
+
+/* Smooth gradient backgrounds */
+.bg-gradient-cyber {
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, #00d9ff 0%, #8338ec 100%);
+}
+
+.bg-gradient-accent2 {
+  background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%);
+}
+
+/* Neon glow effects */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3), inset 0 0 20px rgba(0, 217, 255, 0.1);
+}
+
+.glow-pink {
+  box-shadow: 0 0 20px rgba(255, 0, 110, 0.3), inset 0 0 20px rgba(255, 0, 110, 0.1);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px rgba(131, 56, 236, 0.3), inset 0 0 20px rgba(131, 56, 236, 0.1);
+}
+
+.glow-cyan-lg {
+  box-shadow: 0 0 40px rgba(0, 217, 255, 0.4), inset 0 0 20px rgba(0, 217, 255, 0.1);
+}
+
+.glow-pink-lg {
+  box-shadow: 0 0 40px rgba(255, 0, 110, 0.4), inset 0 0 20px rgba(255, 0, 110, 0.1);
+}
+
+/* Smooth card styles */
+.card-cyber {
+  @apply bg-gradient-to-br from-cyber-surface to-cyber-surface2 border border-cyber-accent/20 rounded-xl backdrop-blur-sm transition-all duration-300 hover:border-cyber-accent/50 hover:shadow-glow-cyan;
+}
+
+.card-cyber-pink {
+  @apply bg-gradient-to-br from-cyber-surface to-cyber-surface2 border border-cyber-accent2/20 rounded-xl backdrop-blur-sm transition-all duration-300 hover:border-cyber-accent2/50 hover:shadow-glow-pink;
+}
+
+.card-cyber-purple {
+  @apply bg-gradient-to-br from-cyber-surface to-cyber-surface2 border border-cyber-accent3/20 rounded-xl backdrop-blur-sm transition-all duration-300 hover:border-cyber-accent3/50 hover:shadow-glow-purple;
+}
+
+/* Smooth button styles */
+.btn-cyber {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out;
+  @apply bg-gradient-to-r from-cyber-accent to-cyber-accent3;
+  @apply text-cyber-dark hover:shadow-glow-cyan-lg hover:scale-105;
+  @apply border border-cyber-accent/50;
+}
+
+.btn-cyber-secondary {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out;
+  @apply bg-gradient-to-r from-cyber-accent2 to-cyber-accent4;
+  @apply text-cyber-dark hover:shadow-glow-pink-lg hover:scale-105;
+  @apply border border-cyber-accent2/50;
+}
+
+.btn-cyber-outline {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out;
+  @apply bg-transparent border-2 border-cyber-accent text-cyber-accent;
+  @apply hover:bg-cyber-accent/10 hover:shadow-glow-cyan hover:scale-105;
+}
+
+.btn-cyber-outline-pink {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out;
+  @apply bg-transparent border-2 border-cyber-accent2 text-cyber-accent2;
+  @apply hover:bg-cyber-accent2/10 hover:shadow-glow-pink hover:scale-105;
+}
+
+/* Input styles */
+.input-cyber {
+  @apply w-full px-4 py-3 rounded-lg;
+  @apply bg-cyber-surface border border-cyber-accent/30;
+  @apply text-cyber-text placeholder-cyber-text2;
+  @apply transition-all duration-300;
+  @apply focus:outline-none focus:border-cyber-accent focus:shadow-glow-cyan;
+}
+
+.input-cyber:focus {
+  @apply border-cyber-accent shadow-glow-cyan;
+}
+
+/* Select styles */
+.select-cyber {
+  @apply w-full px-4 py-3 rounded-lg;
+  @apply bg-cyber-surface border border-cyber-accent/30;
+  @apply text-cyber-text;
+  @apply transition-all duration-300;
+  @apply focus:outline-none focus:border-cyber-accent focus:shadow-glow-cyan;
+}
+
+/* Textarea styles */
+.textarea-cyber {
+  @apply w-full px-4 py-3 rounded-lg;
+  @apply bg-cyber-surface border border-cyber-accent/30;
+  @apply text-cyber-text placeholder-cyber-text2;
+  @apply transition-all duration-300;
+  @apply focus:outline-none focus:border-cyber-accent focus:shadow-glow-cyan;
+  @apply resize-none;
+}
+
+/* Badge styles */
+.badge-cyber {
+  @apply inline-block px-3 py-1 rounded-full text-sm font-semibold;
+  @apply bg-gradient-to-r from-cyber-accent/20 to-cyber-accent3/20;
+  @apply text-cyber-accent border border-cyber-accent/50;
+}
+
+.badge-cyber-pink {
+  @apply inline-block px-3 py-1 rounded-full text-sm font-semibold;
+  @apply bg-gradient-to-r from-cyber-accent2/20 to-cyber-accent4/20;
+  @apply text-cyber-accent2 border border-cyber-accent2/50;
+}
+
+.badge-cyber-purple {
+  @apply inline-block px-3 py-1 rounded-full text-sm font-semibold;
+  @apply bg-gradient-to-r from-cyber-accent3/20 to-cyber-accent/20;
+  @apply text-cyber-accent3 border border-cyber-accent3/50;
+}
+
+/* Navigation styles */
+.nav-cyber {
+  @apply bg-gradient-to-r from-cyber-dark/80 to-cyber-surface/80 backdrop-blur-md;
+  @apply border-b border-cyber-accent/20;
+}
+
+.nav-link {
+  @apply text-cyber-text2 hover:text-cyber-accent transition-colors duration-300;
+  @apply relative;
+}
+
+.nav-link::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyber-accent to-cyber-accent3;
+  @apply transition-all duration-300;
+}
+
+.nav-link:hover::after {
+  @apply w-full;
 }
 
 /* Low stimulation mode */
 .low-stimulation {
-  @apply bg-gray-100 text-gray-900;
+  @apply bg-gray-900 text-gray-100;
 }
 
 .low-stimulation * {
   @apply transition-none;
+}
+
+.low-stimulation .glow-cyan,
+.low-stimulation .glow-pink,
+.low-stimulation .glow-purple {
+  @apply shadow-none;
 }
 
 /* High contrast mode */
@@ -34,6 +220,10 @@ body {
   @apply border-2 border-white;
 }
 
+.high-contrast .card-cyber {
+  @apply bg-black border-2 border-white;
+}
+
 /* Font size utilities */
 .text-small {
   @apply text-sm;
@@ -41,4 +231,54 @@ body {
 
 .text-large {
   @apply text-lg;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  @apply transition-all duration-300 ease-out;
+}
+
+/* Gradient text */
+.text-gradient-cyan {
+  @apply bg-gradient-to-r from-cyber-accent to-cyber-accent3 bg-clip-text text-transparent;
+}
+
+.text-gradient-pink {
+  @apply bg-gradient-to-r from-cyber-accent2 to-cyber-accent4 bg-clip-text text-transparent;
+}
+
+.text-gradient-neon {
+  @apply bg-gradient-to-r from-cyber-accent via-cyber-accent2 to-cyber-accent3 bg-clip-text text-transparent;
+}
+
+/* Divider */
+.divider-cyber {
+  @apply h-px bg-gradient-to-r from-transparent via-cyber-accent/50 to-transparent;
+}
+
+/* Loading animation */
+.loading-spinner {
+  @apply inline-block animate-spin;
+}
+
+.loading-spinner::after {
+  content: '';
+  @apply block w-8 h-8 border-4 border-cyber-accent border-t-cyber-accent2 rounded-full;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-cyber-surface;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-cyber-accent to-cyber-accent3 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply shadow-glow-cyan;
 }

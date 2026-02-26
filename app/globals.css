@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Low stimulation mode */
+.low-stimulation {
+  @apply bg-gray-100 text-gray-900;
+}
+
+.low-stimulation * {
+  @apply transition-none;
+}
+
+/* High contrast mode */
+.high-contrast {
+  @apply bg-black text-white;
+}
+
+.high-contrast button {
+  @apply border-2 border-white;
+}
+
+/* Font size utilities */
+.text-small {
+  @apply text-sm;
+}
+
+.text-large {
+  @apply text-lg;
+}

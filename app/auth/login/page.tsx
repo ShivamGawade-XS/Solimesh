@@ -24,9 +24,14 @@ export default function Login() {
       });
 
       if (error) throw error;
-      router.push('/');
+      
+      // For demo purposes, redirect to home
+      setTimeout(() => {
+        router.push('/');
+      }, 1000);
     } catch (err: any) {
-      setError(err.message || 'Login failed');
+      console.error('Login error:', err);
+      setError(err?.message || 'Login failed. Make sure Supabase is configured.');
     } finally {
       setLoading(false);
     }

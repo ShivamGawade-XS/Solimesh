@@ -36,9 +36,15 @@ export default function Signup() {
       });
 
       if (error) throw error;
-      router.push('/');
+      
+      // For demo purposes, redirect to home if no error
+      // In production, user would need to verify email
+      setTimeout(() => {
+        router.push('/');
+      }, 1000);
     } catch (err: any) {
-      setError(err.message || 'Signup failed');
+      console.error('Signup error:', err);
+      setError(err?.message || 'Signup failed. Make sure Supabase is configured.');
     } finally {
       setLoading(false);
     }

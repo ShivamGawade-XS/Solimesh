@@ -38,8 +38,8 @@ export default function Mesh() {
     const subscription = supabase
       .channel('abundance_signals')
       .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'abundance_signals' },
+        'broadcast' as any,
+        { event: 'signal_update' },
         (payload: any) => {
           if (payload.eventType === 'INSERT') {
             addSignal(payload.new as any);

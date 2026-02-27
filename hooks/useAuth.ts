@@ -7,12 +7,13 @@ export function useAuth() {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data?.session?.user) {
+      const result = await supabase.auth.getSession();
+      const data = result as any;
+      if (data?.data?.session?.user) {
         setUser({
-          id: data.session.user.id,
-          email: data.session.user.email || '',
-          created_at: data.session.user.created_at || '',
+          id: data.data.session.user.id,
+          email: data.data.session.user.email || '',
+          created_at: data.data.session.user.created_at || '',
         });
       }
       setLoading(false);

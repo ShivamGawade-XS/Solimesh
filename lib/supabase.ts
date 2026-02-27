@@ -14,7 +14,11 @@ export function getSupabase(): SupabaseClient | null {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (url && key && url !== 'your_supabase_url_here' && key !== 'your_supabase_anon_key_here') {
+    const isPlaceholder = !url || !key || 
+      url.includes('test') || url.includes('placeholder') || url.includes('your_') ||
+      key.includes('test') || key.includes('placeholder') || key.includes('your_');
+
+    if (!isPlaceholder && url && key) {
       try {
         supabaseClient = createClient(url, key);
         isConfigured = true;

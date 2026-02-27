@@ -8,7 +8,7 @@ export function useAuth() {
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
-      if (data.session?.user) {
+      if (data?.session?.user) {
         setUser({
           id: data.session.user.id,
           email: data.session.user.email || '',
@@ -35,7 +35,7 @@ export function useAuth() {
     );
 
     return () => {
-      authListener?.subscription.unsubscribe();
+      authListener?.subscription?.unsubscribe?.();
     };
   }, [setUser, setLoading]);
 

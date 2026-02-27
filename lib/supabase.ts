@@ -1,36 +1,5 @@
 'use client';
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-
-let supabaseClient: SupabaseClient | null = null;
-let isConfigured = false;
-
-export function getSupabase(): SupabaseClient | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  if (!supabaseClient && !isConfigured) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (url && key) {
-      try {
-        supabaseClient = createClient(url, key);
-        isConfigured = true;
-      } catch (error) {
-        console.warn('Supabase initialization failed. Running in demo mode.');
-        isConfigured = false;
-      }
-    } else {
-      console.log('Supabase not configured. Running in demo mode.');
-      isConfigured = false;
-    }
-  }
-
-  return supabaseClient;
-}
-
 // Mock user generator
 const generateMockUser = (email: string) => ({
   id: 'mock-' + Math.random().toString(36).substr(2, 9),
@@ -49,20 +18,11 @@ const generateMockUser = (email: string) => ({
   updated_at: new Date().toISOString(),
 });
 
-// Create a proxy that returns mock responses when Supabase is not configured
+// Demo mode - always works without Supabase
 export const supabase = {
   auth: {
     signUp: async (credentials: { email: string; password: string }) => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.signUp(credentials);
-        } catch (error) {
-          console.warn('Supabase signup failed, using demo mode');
-        }
-      }
-      
-      // Demo mode response
+      // Always return demo response
       return {
         data: { 
           user: generateMockUser(credentials.email),
@@ -72,16 +32,7 @@ export const supabase = {
       };
     },
     signInWithPassword: async (credentials: { email: string; password: string }) => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.signInWithPassword(credentials);
-        } catch (error) {
-          console.warn('Supabase login failed, using demo mode');
-        }
-      }
-      
-      // Demo mode response
+      // Always return demo response
       return {
         data: { 
           user: generateMockUser(credentials.email),
@@ -97,36 +48,12 @@ export const supabase = {
       };
     },
     signOut: async () => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.signOut();
-        } catch (error) {
-          console.warn('Supabase signout failed');
-        }
-      }
       return { error: null };
     },
     getSession: async () => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.getSession();
-        } catch (error) {
-          console.warn('Supabase getSession failed');
-        }
-      }
       return { data: { session: null } };
     },
     onAuthStateChange: (callback: (event: any, session: any) => void) => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return client.auth.onAuthStateChange(callback);
-        } catch (error) {
-          console.warn('Supabase onAuthStateChange failed');
-        }
-      }
       return {
         data: {
           subscription: {
@@ -137,47 +64,29 @@ export const supabase = {
     },
   },
   from: (table: string) => {
-    const client = getSupabase();
-    if (client) {
-      try {
-        return client.from(table);
-      } catch (error) {
-        console.warn('Supabase from() failed');
-      }
-    }
-    
     // Mock query builder
     return {
       select: (_columns?: string) => ({
-        eq: (column: string, value: any) => ({
-          order: (column: string, options?: any) => 
+        eq: (_column: string, _value: any) => ({
+          order: (_column: string, _options?: any) => 
             Promise.resolve({ data: [], error: null }),
         }),
       }),
-      insert: (data: any) => ({
+      insert: (_data: any) => ({
         select: () => Promise.resolve({ data: [], error: null }),
       }),
-      update: (data: any) => ({
-        eq: (column: string, value: any) => ({
+      update: (_data: any) => ({
+        eq: (_column: string, _value: any) => ({
           select: () => Promise.resolve({ data: [], error: null }),
         }),
       }),
       delete: () => ({
-        eq: (column: string, value: any) => 
+        eq: (_column: string, _value: any) => 
           Promise.resolve({ error: null }),
       }),
     };
   },
   channel: (name: string) => {
-    const client = getSupabase();
-    if (client) {
-      try {
-        return client.channel(name);
-      } catch (error) {
-        console.warn('Supabase channel() failed');
-      }
-    }
-    
     // Mock channel
     return {
       on: (type: string, filter: any, callback: any) => ({

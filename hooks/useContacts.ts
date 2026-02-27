@@ -5,15 +5,17 @@ import { SupportContact } from '@/types';
 export function useContacts(userId: string | undefined) {
   const queryClient = useQueryClient();
 
-  const { data: contacts = [], isLoading } = useQuery({
+  const { data: contacts = [], isLoading, error } = useQuery({
     queryKey: ['contacts', userId],
     queryFn: async () => {
       if (!userId) return [];
+      
       const { data, error } = await supabase
         .from('support_contacts')
         .select('*')
         .eq('user_id', userId)
         .order('last_contact_date', { ascending: false });
+
       if (error) throw error;
       return data as SupportContact[];
     },
@@ -26,6 +28,7 @@ export function useContacts(userId: string | undefined) {
         .from('support_contacts')
         .insert([contact])
         .select();
+
       if (error) throw error;
       return data[0];
     },
@@ -41,6 +44,7 @@ export function useContacts(userId: string | undefined) {
         .update(updates)
         .eq('id', id)
         .select();
+
       if (error) throw error;
       return data[0];
     },
@@ -49,5 +53,26 @@ export function useContacts(userId: string | undefined) {
     },
   });
 
-  return { contacts, isLoading, addContact, updateContact };
+  const deleteContact = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('support_contacts')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts', userId] });
+    },
+  });
+
+  return {
+    contacts,
+    isLoading,
+    error,
+    addContact: addContact.mutate,
+    updateContact: updateContact.mutate,
+    deleteContact: deleteContact.mutate,
+  };
 }

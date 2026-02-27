@@ -1,28 +1,39 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { supabase } from '@/lib/supabase';
 
 export function useAuth() {
   const { user, loading, setUser, setLoading } = useAuthStore();
 
   useEffect(() => {
-    // In demo mode, immediately set a mock user
-    const mockUser = {
-      id: 'demo-user',
-      email: 'demo@solimesh.local',
-      created_at: new Date().toISOString(),
-    };
-    
-    // Check if we have a stored user from previous login
-    const storedUser = typeof window !== 'undefined' ? localStorage.getItem('solimesh_user') : null;
-    if (storedUser) {
+    const initAuth = async () => {
       try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        setUser(mockUser);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUser(session.user as any);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
+        setLoading(false);
       }
-    }
-    
-    setLoading(false);
+    };
+
+    initAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          setUser(session.user as any);
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, [setUser, setLoading]);
 
   return { user, loading };

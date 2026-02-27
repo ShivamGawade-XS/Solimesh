@@ -37,19 +37,8 @@ export default function Signup() {
 
       if (error) throw error;
       
-      // Store user in localStorage for demo mode
-      const user = { 
-        id: 'user-' + Math.random().toString(36).substr(2, 9), 
-        email, 
-        created_at: new Date().toISOString() 
-      };
-      localStorage.setItem('solimesh_user', JSON.stringify(user));
-      
-      setTimeout(() => {
-        router.push('/');
-      }, 500);
+      router.push('/auth/login?message=Check your email to confirm your account');
     } catch (err: any) {
-      console.error('Signup error:', err);
       setError(err?.message || 'Signup failed');
     } finally {
       setLoading(false);

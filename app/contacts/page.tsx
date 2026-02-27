@@ -24,36 +24,28 @@ export default function Contacts() {
     return null;
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await addContact.mutateAsync({
-        ...formData,
-        user_id: user.id,
-        last_contact_date: new Date().toISOString(),
-      });
-      setFormData({
-        contact_name: '',
-        contact_type: 'friend',
-        phone: '',
-        email: '',
-        notes: '',
-      });
-      setShowForm(false);
-    } catch (err) {
-      console.error('Failed to add contact:', err);
-    }
+    addContact({
+      ...formData,
+      user_id: user.id,
+      last_contact_date: new Date().toISOString(),
+    } as any);
+    setFormData({
+      contact_name: '',
+      contact_type: 'friend',
+      phone: '',
+      email: '',
+      notes: '',
+    });
+    setShowForm(false);
   };
 
-  const handleUpdateLastContact = async (contactId: string) => {
-    try {
-      await updateContact.mutateAsync({
-        id: contactId,
-        last_contact_date: new Date().toISOString(),
-      });
-    } catch (err) {
-      console.error('Failed to update contact:', err);
-    }
+  const handleUpdateLastContact = (contactId: string) => {
+    updateContact({
+      id: contactId,
+      last_contact_date: new Date().toISOString(),
+    } as any);
   };
 
   const getDaysSinceContact = (lastContactDate: string) => {

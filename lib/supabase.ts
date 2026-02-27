@@ -3,193 +3,48 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 let supabaseClient: SupabaseClient | null = null;
-let isConfigured = false;
 
-export function getSupabase(): SupabaseClient | null {
+export function getSupabase(): SupabaseClient {
   if (typeof window === 'undefined') {
-    return null;
+    throw new Error('Supabase client can only be used in browser');
   }
 
-  if (!supabaseClient && !isConfigured) {
+  if (!supabaseClient) {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    const isPlaceholder = !url || !key || 
-      url.includes('test') || url.includes('placeholder') || url.includes('your_') ||
-      key.includes('test') || key.includes('placeholder') || key.includes('your_');
-
-    if (!isPlaceholder && url && key) {
-      try {
-        supabaseClient = createClient(url, key);
-        isConfigured = true;
-        console.log('✅ Supabase configured - using real backend');
-      } catch (error) {
-        console.warn('⚠️ Supabase initialization failed');
-        isConfigured = false;
-      }
-    } else {
-      console.log('ℹ️ Supabase not configured - using demo mode');
-      isConfigured = false;
+    if (!url || !key) {
+      throw new Error('Missing Supabase environment variables. Please configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
     }
+
+    supabaseClient = createClient(url, key);
   }
 
   return supabaseClient;
 }
 
-// Mock user generator
-const generateMockUser = (email: string) => ({
-  id: 'mock-' + Math.random().toString(36).substr(2, 9),
-  email,
-  created_at: new Date().toISOString(),
-  user_metadata: {},
-  app_metadata: {},
-  aud: 'authenticated',
-  confirmation_sent_at: null,
-  confirmed_at: new Date().toISOString(),
-  email_confirmed_at: new Date().toISOString(),
-  phone: '',
-  phone_confirmed_at: null,
-  last_sign_in_at: new Date().toISOString(),
-  role: 'authenticated',
-  updated_at: new Date().toISOString(),
-});
-
-// Create a proxy that uses real Supabase when configured, falls back to demo mode
 export const supabase = {
   auth: {
     signUp: async (credentials: { email: string; password: string }) => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.signUp(credentials);
-        } catch (error) {
-          console.warn('Supabase signup failed, using demo mode');
-        }
-      }
-      
-      // Demo mode response
-      return {
-        data: { 
-          user: generateMockUser(credentials.email),
-          session: null 
-        },
-        error: null,
-      };
+      return getSupabase().auth.signUp(credentials);
     },
     signInWithPassword: async (credentials: { email: string; password: string }) => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.signInWithPassword(credentials);
-        } catch (error) {
-          console.warn('Supabase login failed, using demo mode');
-        }
-      }
-      
-      // Demo mode response
-      return {
-        data: { 
-          user: generateMockUser(credentials.email),
-          session: {
-            access_token: 'mock-token-' + Math.random().toString(36).substr(2, 9),
-            token_type: 'bearer',
-            expires_in: 3600,
-            refresh_token: 'mock-refresh-' + Math.random().toString(36).substr(2, 9),
-            user: generateMockUser(credentials.email),
-          }
-        },
-        error: null,
-      };
+      return getSupabase().auth.signInWithPassword(credentials);
     },
     signOut: async () => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.signOut();
-        } catch (error) {
-          console.warn('Supabase signout failed');
-        }
-      }
-      return { error: null };
+      return getSupabase().auth.signOut();
     },
     getSession: async () => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return await client.auth.getSession();
-        } catch (error) {
-          console.warn('Supabase getSession failed');
-        }
-      }
-      return { data: { session: null } };
+      return getSupabase().auth.getSession();
     },
     onAuthStateChange: (callback: (event: any, session: any) => void) => {
-      const client = getSupabase();
-      if (client) {
-        try {
-          return client.auth.onAuthStateChange(callback);
-        } catch (error) {
-          console.warn('Supabase onAuthStateChange failed');
-        }
-      }
-      return {
-        data: {
-          subscription: {
-            unsubscribe: () => {},
-          },
-        },
-      };
+      return getSupabase().auth.onAuthStateChange(callback);
     },
   },
   from: (table: string) => {
-    const client = getSupabase();
-    if (client) {
-      try {
-        return client.from(table);
-      } catch (error) {
-        console.warn('Supabase from() failed');
-      }
-    }
-    
-    // Mock query builder
-    return {
-      select: (_columns?: string) => ({
-        eq: (_col: string, _val: any) => ({
-          order: (_col: string, _opts?: any) => 
-            Promise.resolve({ data: [], error: null }),
-        }),
-      }),
-      insert: (_data: any) => ({
-        select: () => Promise.resolve({ data: [], error: null }),
-      }),
-      update: (_data: any) => ({
-        eq: (_col: string, _val: any) => ({
-          select: () => Promise.resolve({ data: [], error: null }),
-        }),
-      }),
-      delete: () => ({
-        eq: (_col: string, _val: any) => 
-          Promise.resolve({ error: null }),
-      }),
-    };
+    return getSupabase().from(table);
   },
   channel: (name: string) => {
-    const client = getSupabase();
-    if (client) {
-      try {
-        return client.channel(name);
-      } catch (error) {
-        console.warn('Supabase channel() failed');
-      }
-    }
-    
-    // Mock channel
-    return {
-      on: (_type: string, _filter: any, _callback: any) => ({
-        subscribe: () => ({
-          unsubscribe: () => {},
-        }),
-      }),
-    };
+    return getSupabase().channel(name);
   },
 };

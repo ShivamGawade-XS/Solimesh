@@ -5,15 +5,17 @@ import { PantryItem } from '@/types';
 export function usePantry(userId: string | undefined) {
   const queryClient = useQueryClient();
 
-  const { data: items = [], isLoading } = useQuery({
+  const { data: items = [], isLoading, error } = useQuery({
     queryKey: ['pantry', userId],
     queryFn: async () => {
       if (!userId) return [];
+      
       const { data, error } = await supabase
         .from('pantry_items')
         .select('*')
         .eq('user_id', userId)
         .order('expiry_date', { ascending: true });
+
       if (error) throw error;
       return data as PantryItem[];
     },
@@ -26,6 +28,23 @@ export function usePantry(userId: string | undefined) {
         .from('pantry_items')
         .insert([item])
         .select();
+
+      if (error) throw error;
+      return data[0];
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pantry', userId] });
+    },
+  });
+
+  const updateItem = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<PantryItem> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('pantry_items')
+        .update(updates)
+        .eq('id', id)
+        .select();
+
       if (error) throw error;
       return data[0];
     },
@@ -40,6 +59,7 @@ export function usePantry(userId: string | undefined) {
         .from('pantry_items')
         .delete()
         .eq('id', id);
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -47,5 +67,12 @@ export function usePantry(userId: string | undefined) {
     },
   });
 
-  return { items, isLoading, addItem, deleteItem };
+  return {
+    items,
+    isLoading,
+    error,
+    addItem: addItem.mutate,
+    updateItem: updateItem.mutate,
+    deleteItem: deleteItem.mutate,
+  };
 }

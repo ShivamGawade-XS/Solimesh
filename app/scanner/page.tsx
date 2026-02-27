@@ -45,22 +45,18 @@ export default function Scanner() {
     reader.readAsDataURL(file);
   };
 
-  const handleAddItem = async (itemName: string) => {
-    try {
-      await addItem.mutateAsync({
-        user_id: user.id,
-        item_name: itemName,
-        quantity: 1,
-        unit: 'unit',
-        expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        storage_location: 'Pantry',
-        storage_tips: 'Store in cool, dry place',
-        image_url: preview || '',
-      });
-      setItems(items.filter((i) => i !== itemName));
-    } catch (err: any) {
-      setError(err.message || 'Failed to add item');
-    }
+  const handleAddItem = (itemName: string) => {
+    addItem({
+      user_id: user.id,
+      item_name: itemName,
+      quantity: 1,
+      unit: 'unit',
+      expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      storage_location: 'Pantry',
+      storage_tips: 'Store in cool, dry place',
+      image_url: preview || '',
+    } as any);
+    setItems(items.filter((i) => i !== itemName));
   };
 
   return (

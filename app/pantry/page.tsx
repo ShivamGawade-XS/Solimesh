@@ -99,7 +99,7 @@ export default function Pantry() {
                         {badge.text}
                       </div>
                       <button
-                        onClick={() => deleteItem.mutate(item.id)}
+                        onClick={() => deleteItem(item.id)}
                         className="btn-cyber-outline-pink px-4 py-2 text-sm"
                       >
                         Delete

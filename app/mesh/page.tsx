@@ -29,7 +29,7 @@ export default function Mesh() {
         .order('created_at', { ascending: false });
 
       if (!error && data) {
-        setSignals(data);
+        setSignals(data as any);
       }
     };
 
@@ -38,11 +38,11 @@ export default function Mesh() {
     const subscription = supabase
       .channel('abundance_signals')
       .on(
-        'broadcast' as any,
-        { event: 'signal_update' },
+        'postgres_changes' as any,
+        { event: 'INSERT', schema: 'public', table: 'abundance_signals' },
         (payload: any) => {
-          if (payload.eventType === 'INSERT') {
-            addSignal(payload.new as any);
+          if (payload.new.signal_status === 'active') {
+            addSignal(payload.new);
           }
         }
       )
@@ -54,7 +54,7 @@ export default function Mesh() {
   }, [user, setSignals, addSignal, router]);
 
   const handleCreateSignal = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || !user) return;
 
     setLoading(true);
     try {
@@ -62,7 +62,7 @@ export default function Mesh() {
         .from('abundance_signals')
         .insert([
           {
-            user_id: user?.id,
+            user_id: user.id,
             item_id: selectedItem,
             location: { lat: 0, lng: 0 },
             stress_level: stressLevel,
@@ -179,14 +179,14 @@ export default function Mesh() {
               </div>
             ) : (
               <div className="space-y-4">
-                {signals.map((signal) => (
+                {signals.map((signal: any) => (
                   <div
                     key={signal.id}
                     className="card-cyber p-6 border-l-4 border-cyber-accent hover:scale-102 transition-transform"
                   >
                     <div className="flex justify-between items-start gap-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-cyber-accent mb-2">Item Available</h3>
+                        <h3 className="text-lg font-bold text-cyber-accent mb-2">{signal.item_id}</h3>
                         <div className="space-y-2">
                           <p className="text-sm text-cyber-text2">
                             Stress Level: <span className="text-cyber-accent2 font-semibold">{signal.stress_level}/10</span>

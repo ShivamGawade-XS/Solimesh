@@ -6,38 +6,24 @@ export function useAuth() {
   const { user, loading, setUser, setLoading } = useAuthStore();
 
   useEffect(() => {
-    const getSession = async () => {
-      const result = await supabase.auth.getSession();
-      const data = result as any;
-      if (data?.data?.session?.user) {
-        setUser({
-          id: data.data.session.user.id,
-          email: data.data.session.user.email || '',
-          created_at: data.data.session.user.created_at || '',
-        });
-      }
-      setLoading(false);
+    // In demo mode, immediately set a mock user
+    const mockUser = {
+      id: 'demo-user',
+      email: 'demo@solimesh.local',
+      created_at: new Date().toISOString(),
     };
-
-    getSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            created_at: session.user.created_at || '',
-          });
-        } else {
-          setUser(null);
-        }
+    
+    // Check if we have a stored user from previous login
+    const storedUser = typeof window !== 'undefined' ? localStorage.getItem('solimesh_user') : null;
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        setUser(mockUser);
       }
-    );
-
-    return () => {
-      authListener?.subscription?.unsubscribe?.();
-    };
+    }
+    
+    setLoading(false);
   }, [setUser, setLoading]);
 
   return { user, loading };

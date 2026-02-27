@@ -37,14 +37,20 @@ export default function Signup() {
 
       if (error) throw error;
       
-      // For demo purposes, redirect to home if no error
-      // In production, user would need to verify email
+      // Store user in localStorage for demo mode
+      const user = { 
+        id: 'user-' + Math.random().toString(36).substr(2, 9), 
+        email, 
+        created_at: new Date().toISOString() 
+      };
+      localStorage.setItem('solimesh_user', JSON.stringify(user));
+      
       setTimeout(() => {
         router.push('/');
-      }, 1000);
+      }, 500);
     } catch (err: any) {
       console.error('Signup error:', err);
-      setError(err?.message || 'Signup failed. Make sure Supabase is configured.');
+      setError(err?.message || 'Signup failed');
     } finally {
       setLoading(false);
     }

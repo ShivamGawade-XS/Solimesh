@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 
 export function useAuth() {

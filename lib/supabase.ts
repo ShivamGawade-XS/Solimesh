@@ -150,8 +150,8 @@ export const supabase = {
     // Mock query builder
     return {
       select: (_columns?: string) => ({
-        eq: (_column: string, _value: any) => ({
-          order: (_column: string, _options?: any) => 
+        eq: (_col: string, _val: any) => ({
+          order: (_col: string, _opts?: any) => 
             Promise.resolve({ data: [], error: null }),
         }),
       }),
@@ -159,12 +159,12 @@ export const supabase = {
         select: () => Promise.resolve({ data: [], error: null }),
       }),
       update: (_data: any) => ({
-        eq: (_column: string, _value: any) => ({
+        eq: (_col: string, _val: any) => ({
           select: () => Promise.resolve({ data: [], error: null }),
         }),
       }),
       delete: () => ({
-        eq: (_column: string, _value: any) => 
+        eq: (_col: string, _val: any) => 
           Promise.resolve({ error: null }),
       }),
     };
@@ -181,7 +181,7 @@ export const supabase = {
     
     // Mock channel
     return {
-      on: (type: string, filter: any, callback: any) => ({
+      on: (_type: string, _filter: any, _callback: any) => ({
         subscribe: () => ({
           unsubscribe: () => {},
         }),

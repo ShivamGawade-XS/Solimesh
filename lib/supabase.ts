@@ -1,5 +1,37 @@
 'use client';
 
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+let supabaseClient: SupabaseClient | null = null;
+let isConfigured = false;
+
+export function getSupabase(): SupabaseClient | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  if (!supabaseClient && !isConfigured) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (url && key && url !== 'your_supabase_url_here' && key !== 'your_supabase_anon_key_here') {
+      try {
+        supabaseClient = createClient(url, key);
+        isConfigured = true;
+        console.log('✅ Supabase configured - using real backend');
+      } catch (error) {
+        console.warn('⚠️ Supabase initialization failed');
+        isConfigured = false;
+      }
+    } else {
+      console.log('ℹ️ Supabase not configured - using demo mode');
+      isConfigured = false;
+    }
+  }
+
+  return supabaseClient;
+}
+
 // Mock user generator
 const generateMockUser = (email: string) => ({
   id: 'mock-' + Math.random().toString(36).substr(2, 9),
@@ -18,11 +50,20 @@ const generateMockUser = (email: string) => ({
   updated_at: new Date().toISOString(),
 });
 
-// Demo mode - always works without Supabase
+// Create a proxy that uses real Supabase when configured, falls back to demo mode
 export const supabase = {
   auth: {
     signUp: async (credentials: { email: string; password: string }) => {
-      // Always return demo response
+      const client = getSupabase();
+      if (client) {
+        try {
+          return await client.auth.signUp(credentials);
+        } catch (error) {
+          console.warn('Supabase signup failed, using demo mode');
+        }
+      }
+      
+      // Demo mode response
       return {
         data: { 
           user: generateMockUser(credentials.email),
@@ -32,7 +73,16 @@ export const supabase = {
       };
     },
     signInWithPassword: async (credentials: { email: string; password: string }) => {
-      // Always return demo response
+      const client = getSupabase();
+      if (client) {
+        try {
+          return await client.auth.signInWithPassword(credentials);
+        } catch (error) {
+          console.warn('Supabase login failed, using demo mode');
+        }
+      }
+      
+      // Demo mode response
       return {
         data: { 
           user: generateMockUser(credentials.email),
@@ -48,12 +98,36 @@ export const supabase = {
       };
     },
     signOut: async () => {
+      const client = getSupabase();
+      if (client) {
+        try {
+          return await client.auth.signOut();
+        } catch (error) {
+          console.warn('Supabase signout failed');
+        }
+      }
       return { error: null };
     },
     getSession: async () => {
+      const client = getSupabase();
+      if (client) {
+        try {
+          return await client.auth.getSession();
+        } catch (error) {
+          console.warn('Supabase getSession failed');
+        }
+      }
       return { data: { session: null } };
     },
     onAuthStateChange: (callback: (event: any, session: any) => void) => {
+      const client = getSupabase();
+      if (client) {
+        try {
+          return client.auth.onAuthStateChange(callback);
+        } catch (error) {
+          console.warn('Supabase onAuthStateChange failed');
+        }
+      }
       return {
         data: {
           subscription: {
@@ -64,6 +138,15 @@ export const supabase = {
     },
   },
   from: (table: string) => {
+    const client = getSupabase();
+    if (client) {
+      try {
+        return client.from(table);
+      } catch (error) {
+        console.warn('Supabase from() failed');
+      }
+    }
+    
     // Mock query builder
     return {
       select: (_columns?: string) => ({
@@ -87,6 +170,15 @@ export const supabase = {
     };
   },
   channel: (name: string) => {
+    const client = getSupabase();
+    if (client) {
+      try {
+        return client.channel(name);
+      } catch (error) {
+        console.warn('Supabase channel() failed');
+      }
+    }
+    
     // Mock channel
     return {
       on: (type: string, filter: any, callback: any) => ({
